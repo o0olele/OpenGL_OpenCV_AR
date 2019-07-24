@@ -50,39 +50,7 @@ cv::Ptr<cv::aruco::DetectorParameters> detectorParams = cv::aruco::DetectorParam
 float markerLength = 1.75; // this should be in meters
 
 cv::Mat viewMatrix = cv::Mat::zeros(4, 4, CV_32F);
-float modelMatrix[16];
-
-float scaleFactor = 1.0f / 64;
-
 bool is_mark = false;
-Vec3f trans;
-
-static inline float
-DegToRad(float degrees)
-{
-	return (float)(degrees * (CV_PI / 180.0f));
-};
-
-double getPSNR(const Mat& I1, const Mat& I2)
-{
-	Mat s1;
-	absdiff(I1, I2, s1);       // |I1 - I2|
-	s1.convertTo(s1, CV_32F);  // cannot make a square on 8 bits
-	s1 = s1.mul(s1);           // |I1 - I2|^2
-
-	Scalar s = sum(s1);        // sum elements per channel
-
-	double sse = s.val[0] + s.val[1] + s.val[2]; // sum channels
-
-	if (sse <= 1e-10) // for small values return zero
-		return 0;
-	else
-	{
-		double  mse = sse / (double)(I1.channels() * I1.total());
-		double psnr = 10.0*log10((255 * 255) / mse);
-		return psnr;
-	}
-}
 
 
 void readCameraPara()
@@ -138,7 +106,7 @@ void detectArucoMarkers(cv::Mat &image) {
 				{
 					viewMatrixf.at<float>(row, col) = (float)rot.at<double>(row, col);
 				}
-				viewMatrixf.at<float>(row, 3) = (float)tvecs[i][row];// *0.1f;
+				viewMatrixf.at<float>(row, 3) = (float)tvecs[i][row];
 			}
 			viewMatrixf.at<float>(3, 3) = 1.0f;
 
@@ -170,91 +138,6 @@ void detectArucoMarkers(cv::Mat &image) {
 
 }
 
-// sets the square matrix mat to the identity matrix,
-// size refers to the number of rows (or columns)
-void setIdentityMatrix(float *mat, int size) {
-
-	// fill matrix with 0s
-	for (int i = 0; i < size * size; ++i)
-		mat[i] = 0.0f;
-
-	// fill diagonal with 1s
-	for (int i = 0; i < size; ++i)
-		mat[i + i * size] = 1.0f;
-}
-
-
-//
-// a = a * b;
-//
-void multMatrix(float *a, float *b) {
-
-	float res[16];
-
-	for (int i = 0; i < 4; ++i) {
-		for (int j = 0; j < 4; ++j) {
-			res[j * 4 + i] = 0.0f;
-			for (int k = 0; k < 4; ++k) {
-				res[j * 4 + i] += a[k * 4 + i] * b[j * 4 + k];
-			}
-		}
-	}
-	memcpy(a, res, 16 * sizeof(float));
-
-}
-
-
-// Defines a transformation matrix mat with a translation
-void setTranslationMatrix(float *mat, float x, float y, float z) {
-
-	setIdentityMatrix(mat, 4);
-	mat[12] = x;
-	mat[13] = y;
-	mat[14] = z;
-}
-
-// Defines a transformation matrix mat with a scale
-void setScaleMatrix(float *mat, float sx, float sy, float sz) {
-
-	setIdentityMatrix(mat, 4);
-	mat[0] = sx;
-	mat[5] = sy;
-	mat[10] = sz;
-}
-
-// Defines a transformation matrix mat with a rotation 
-// angle alpha and a rotation axis (x,y,z)
-void setRotationMatrix(float *mat, float angle, float x, float y, float z) {
-
-	float radAngle = DegToRad(angle);
-	float co = cos(radAngle);
-	float si = sin(radAngle);
-	float x2 = x * x;
-	float y2 = y * y;
-	float z2 = z * z;
-
-	mat[0] = x2 + (y2 + z2) * co;
-	mat[4] = x * y * (1 - co) - z * si;
-	mat[8] = x * z * (1 - co) + y * si;
-	mat[12] = 0.0f;
-
-	mat[1] = x * y * (1 - co) + z * si;
-	mat[5] = y2 + (x2 + z2) * co;
-	mat[9] = y * z * (1 - co) - x * si;
-	mat[13] = 0.0f;
-
-	mat[2] = x * z * (1 - co) - y * si;
-	mat[6] = y * z * (1 - co) + x * si;
-	mat[10] = z2 + (x2 + y2) * co;
-	mat[14] = 0.0f;
-
-	mat[3] = 0.0f;
-	mat[7] = 0.0f;
-	mat[11] = 0.0f;
-	mat[15] = 1.0f;
-
-}
-
 
 // ----------------------------------------------------
 // Model Matrix 
@@ -264,41 +147,12 @@ void setRotationMatrix(float *mat, float angle, float x, float y, float z) {
 
 void setModelMatrix() {
 
+	glm::mat4 model = glm::mat4(1.0f);
 	glBindBuffer(GL_UNIFORM_BUFFER, matricesUniBuffer);
 	glBufferSubData(GL_UNIFORM_BUFFER,
-		ModelMatrixOffset, MatrixSize, modelMatrix);
+		ModelMatrixOffset, MatrixSize, glm::value_ptr(model));
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-}
-
-// The equivalent to glTranslate applied to the model matrix
-void translate(float x, float y, float z) {
-
-	float aux[16];
-
-	setTranslationMatrix(aux, x, y, z);
-	multMatrix(modelMatrix, aux);
-	setModelMatrix();
-}
-
-// The equivalent to glRotate applied to the model matrix
-void rotate(float angle, float x, float y, float z) {
-
-	float aux[16];
-
-	setRotationMatrix(aux, angle, x, y, z);
-	multMatrix(modelMatrix, aux);
-	setModelMatrix();
-}
-
-// The equivalent to glScale applied to the model matrix
-void scale(float x, float y, float z) {
-
-	float aux[16];
-
-	setScaleMatrix(aux, x, y, z);
-	multMatrix(modelMatrix, aux);
-	setModelMatrix();
 }
 
 // ----------------------------------------------------
@@ -416,7 +270,7 @@ int main()
 	// texture coord attribute
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 	glEnableVertexAttribArray(2);
-
+	//enable depth test
 	glEnable(GL_DEPTH_TEST);
 
 	Shader ourShader("shader.vs", "shader.fs");
@@ -493,9 +347,10 @@ int main()
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUniBuffer, 0, MatricesUniBufferSize); //setUniforms();
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
+	// cube texture
 	// load and create a texture 
 	// -------------------------
-	unsigned int texture1, texture2;
+	unsigned int texture1;
 	// texture 1
 	// ---------
 	glGenTextures(1, &texture1);
@@ -576,12 +431,7 @@ int main()
 
 		setCamera(viewMatrix);
 
-		glm::mat4 model = glm::mat4(1.0f);
-		//model = glm::rotate(model, 90.0f, glm::vec3(1.0f, 0.0f, 0.0f));
-		glBindBuffer(GL_UNIFORM_BUFFER, matricesUniBuffer);
-		glBufferSubData(GL_UNIFORM_BUFFER,
-			ModelMatrixOffset, MatrixSize, glm::value_ptr(model));
-		glBindBuffer(GL_UNIFORM_BUFFER, 0);
+		setModelMatrix();
 
 		// bind textures on corresponding texture units
 		glActiveTexture(GL_TEXTURE0);
