@@ -1,7 +1,7 @@
 # About these files
 - camera.yml
 
-  the parameters of the camera using in this project
+  the parameters of the camera using in this project, maybe you need to get this file by [opencv aruco](https://docs.opencv.org/4.0.1/da/d13/tutorial_aruco_calibration.html) module
   
 - stb_image.h
 
