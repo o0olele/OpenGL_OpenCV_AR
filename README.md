@@ -4,7 +4,7 @@ Some demos of AR using OpenCV&amp;OpenGL
 > - OpenCV:4.0.1
 > - OpenCV aruco:4.0.1
 > - OpenGL:glad&glfw
-> - [CSDN BLOG](https://blog.csdn.net/qq_33446100/article/details/96845829)
+> - [CSDN BLOG](https://blog.csdn.net/qq_33446100/article/category/8832373)
 
 # Cube Demo
  - gif(the result)
