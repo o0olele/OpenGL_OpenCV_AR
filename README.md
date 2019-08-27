@@ -16,3 +16,10 @@ Some demos of AR using OpenCV&amp;OpenGL
  - gif
  
  ![model demo](./Model%20Demo/img/model.webp)
+
+# Skeletal-animation Demo
+- opengl skeletal animation referrence:[tigert1998/skeletal-animation](https://github.com/tigert1998/skeletal-animation)
+- require:[assimp](https://github.com/assimp/assimp)
+- gif
+
+![skeletal demo](./Skeletal%20Demo/img/demo.webp)
