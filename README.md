@@ -9,7 +9,7 @@ Some demos of AR using OpenCV&amp;OpenGL
 # Cube Demo
  - gif(the result)
  
- ![draw cube demo](https://github.com/o0olele/OpenGL_OpenCV_AR/blob/master/Cube%20Demo/img/draw_cube.gif)
+ ![draw cube demo](./Cube%20Demo/img/draw_cube.gif)
  
  # Model Demo
  - require:[assimp](https://github.com/assimp/assimp)
