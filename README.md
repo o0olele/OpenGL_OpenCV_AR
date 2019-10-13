@@ -7,7 +7,7 @@ Some demos of AR using OpenCV&amp;OpenGL
 > - [CSDN BLOG](https://blog.csdn.net/qq_33446100/article/category/8832373)
 
 # Cube Demo
- - vs project available, see release
+ - vs project available, see [release](https://github.com/o0olele/OpenGL_OpenCV_AR/releases)
  - gif(the result)
  
  ![draw cube demo](./Cube%20Demo/img/draw_cube.gif)
