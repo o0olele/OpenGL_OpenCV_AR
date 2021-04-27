@@ -24,3 +24,6 @@ Some demos of AR using OpenCV&amp;OpenGL
 - gif
 
 ![skeletal demo](./Skeletal%20Demo/img/demo.webp)
+
+# Known Issue
+- [memory crashed #2](https://github.com/o0olele/OpenGL_OpenCV_AR/issues/2)
