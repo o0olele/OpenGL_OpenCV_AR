@@ -83,4 +83,7 @@ void Background::Draw(Mat &frame)
 
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	
+	// see issue#2
+	// glDeleteTextures(1, &texture);
 }
