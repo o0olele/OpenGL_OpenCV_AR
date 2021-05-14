@@ -59,7 +59,7 @@ void readCameraPara()
 {
 	dictionary = cv::aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(0));
 
-	cv::FileStorage fs("camera.yml", cv::FileStorage::READ);
+	cv::FileStorage fs("./bin/camera.yml", cv::FileStorage::READ);
 
 	fs["camera_matrix"] >> camera_matrix;
 	fs["distortion_coefficients"] >> dist_coeffs;
