@@ -8,6 +8,7 @@ Some demos of AR using OpenCV&amp;OpenGL
 
 # Cube Demo
  - vs project available, see [release](https://github.com/o0olele/OpenGL_OpenCV_AR/releases)
+ - code for linux available, see "Cube Demo Linux"
  - gif(the result)
  
  ![draw cube demo](./Cube%20Demo/img/draw_cube.gif)
