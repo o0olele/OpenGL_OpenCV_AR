@@ -67,6 +67,10 @@ cp -r glm/glm ./"Cube Demo Linux"/include
 cd ./"Cube Demo Linux"
 cmake .
 make
+# before run, you need generate the camera parameters (Camera Calibration) for your own camera.
+# see https://blog.csdn.net/qq_33446100/article/details/89192005
+# or
+# https://docs.opencv.org/4.0.1/da/d13/tutorial_aruco_calibration.html
 ./Demo
 
 ~~~
