@@ -18,7 +18,7 @@ git clone https://github.com/opencv/opencv_contrib.git
 # prepare
 cd opencv
 mkdir build && cd build
-# cmake参数
+# cmake params
 cmake \
 -D CMAKE_BUILD_TYPE=RELEASE \
 -D CMAKE_INSTALL_PREFIX=~/project/libcv \
