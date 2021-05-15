@@ -196,11 +196,13 @@ int main()
 {
 	readCameraPara();
 	// 初始化glfw配置
+	// glfw init
 	glfwInit();
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	// 创建glfw窗口
+	// glfw window
 	GLFWwindow* window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "LearnOpenGL", NULL, NULL);
 	if (window == NULL)
 	{
@@ -212,6 +214,7 @@ int main()
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 	// glad初始化
+	// glad init
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
 	{
 		std::cout << "Failed to initialize GLAD" << std::endl;
@@ -219,6 +222,7 @@ int main()
 	}
 
 	// 创建正射投影所用的shader
+	// create shader for orthographic projection
 	Shader texShader("shader/texture.vs", "shader/texture.fs");
 
 	// 设置正射投影数据
@@ -259,8 +263,8 @@ int main()
 	glEnable(GL_DEPTH_TEST);
 
 	Shader ourShader("shader/shader.vs", "shader/shader.fs");
-	// set up vertex data (and buffer(s)) and configure vertex attributes
-	// ------------------------------------------------------------------
+	// 准备方块数据
+	// cube data
 	float cube_w = 0.5f;
 	float vertices[] = {
 		-cube_w + cube_w, -cube_w + cube_w, -cube_w + cube_w, 0.0f, 0.0f,
@@ -332,12 +336,10 @@ int main()
 	glBindBufferRange(GL_UNIFORM_BUFFER, 0, matricesUniBuffer, 0, MatricesUniBufferSize); //setUniforms();
 	glBindBuffer(GL_UNIFORM_BUFFER, 0);
 
-	// cube texture
-	// load and create a texture 
-	// -------------------------
+	// 这里把方块纹理注释掉了，不是必要内容
+	// dismiss cube texture, not necessary
 	// unsigned int texture1;
 	// // texture 1
-	// // ---------
 	// glGenTextures(1, &texture1);
 	// glBindTexture(GL_TEXTURE_2D, texture1);
 	// // set the texture wrapping parameters
@@ -368,8 +370,8 @@ int main()
 
 	buildProjectionMatrix(0.01f, 1000.0f);
 
-	// load and create a texture 
-	// -------------------------
+	// 准备正射投影 纹理数据 也就是真实相机捕获的图像
+	// texture preparation
 	unsigned int texture;
 	glGenTextures(1, &texture);
 	glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
@@ -388,22 +390,27 @@ int main()
 		// -----
 		processInput(window);
 
-		// load image, create texture and generate mipmaps
+		// 相机读取一帧
+		// capture
 		Mat frame;
 		cap >> frame;
 
+		// 姿态估计
+		// camera pose estimation
 		detectArucoMarkers(frame);
 		cv::flip(frame, frame, 0);
-
+		
+		// 生成纹理
+		// gen texture from camera capture data
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, frame.cols, frame.rows, 0, GL_BGR, GL_UNSIGNED_BYTE, frame.data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 
 		// render
-		// ------
 		glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		// bind Texture
+		// 绑定纹理
+		// bind texture
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		// render container
@@ -425,12 +432,17 @@ int main()
 		// activate shader
 		ourShader.use();
 
-		// render box
+		// 如果检测到标记，就渲染方块
+		// if marker detected, render the box
 		if (is_mark)
 		{
 			glBindVertexArray(VAO);
+			// 使用线条模式
+			// use gl line mode
 			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 			glDrawArrays(GL_TRIANGLES, 0, 36);
+			// 重新设置为填充模式
+			// reset to gl fill mode
 			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
