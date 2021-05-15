@@ -30,14 +30,19 @@ const unsigned int SCR_HEIGHT = 480;
 
 GLuint matricesUniBuffer;
 // 定义三个矩阵的缓存大小
+// size of three matrix
 #define MatricesUniBufferSize sizeof(float) * 16 * 3
 // projection矩阵偏移
+// projection mat offset
 #define ProjMatrixOffset 0
 // view矩阵偏移
+// view mat offset
 #define ViewMatrixOffset sizeof(float) * 16
 // model矩阵偏移
+// model mat offset
 #define ModelMatrixOffset sizeof(float) * 16 * 2
 // 矩阵大小
+// mat size
 #define MatrixSize sizeof(float) * 16
 
 VideoCapture cap(1);
@@ -55,6 +60,8 @@ bool is_mark = false;
 
 
 // 读取相机参数
+// read your camera's params from camera.yml
+// see readme
 void readCameraPara()
 {
 	dictionary = cv::aruco::getPredefinedDictionary(aruco::PREDEFINED_DICTIONARY_NAME(0));
@@ -86,6 +93,7 @@ void detectArucoMarkers(cv::Mat &image) {
 
 		std::vector< cv::Vec3d > rvecs, tvecs;
 
+		// pose estimation
 		cv::aruco::estimatePoseSingleMarkers(
 			markerCorners,    // vector of already detected markers corners
 			markerLength,    // length of the marker's side
@@ -112,6 +120,7 @@ void detectArucoMarkers(cv::Mat &image) {
 			}
 			viewMatrixf.at<float>(3, 3) = 1.0f;
 
+			// change to opengl world
 			cv::Mat cvToGl = cv::Mat::zeros(4, 4, CV_32F);
 			cvToGl.at<float>(0, 0) = 1.0f;
 			cvToGl.at<float>(1, 1) = -1.0f; // Invert the y axis 
